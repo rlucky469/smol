@@ -1,0 +1,190 @@
+<app-bread-crumbs title="Profile Analyse"></app-bread-crumbs>
+
+@if (view() === 'form') {
+  <div class="grant-finder d-flex flex-column align-items-center py-5 px-3">
+
+    <!-- Header -->
+    <div class="text-center mb-5" style="max-width: 640px;">
+      <div class="grant-finder-icon d-flex align-items-center justify-content-center mx-auto mb-4">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" fill="currentColor"/>
+          <path d="M19 14L19.7 16.3L22 17L19.7 17.7L19 20L18.3 17.7L16 17L18.3 16.3L19 14Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h1 class="fw-bold mb-3">AI Grant Finder</h1>
+      <p class="text-muted mb-0">
+        Paste your website URL. AI reads your mission and scores<br />
+        7,800+ grants in under 60 seconds.
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="card grant-finder-card border-0 shadow-sm w-100" style="max-width: 700px;">
+      <div class="card-body p-4">
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills grant-finder-tabs mb-4">
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-link"
+              [class.active]="activeTab() === 'url'"
+              (click)="setTab('url')"
+            >
+              Website URL
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-link"
+              [class.active]="activeTab() === 'pdf'"
+              (click)="setTab('pdf')"
+            >
+              Upload PDF
+            </button>
+          </li>
+        </ul>
+
+        <h4 class="fw-bold mb-2">NGO Information</h4>
+        <p class="text-muted mb-4">
+          AI analyzes your website or documents to understand your mission, focus areas, and
+          beneficiaries — no forms to fill.
+        </p>
+
+        <!-- Input row -->
+        <div class="d-flex flex-column flex-sm-row gap-3">
+
+          @if (activeTab() === 'url') {
+            <div class="input-group grant-finder-input">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="fa fa-globe text-muted"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control border-start-0"
+                placeholder="Paste your NGO website URL — AI does the rest"
+                [(ngModel)]="websiteUrl"
+                (keydown.enter)="findGrants()"
+              />
+            </div>
+          } @else {
+            <label class="input-group grant-finder-input mb-0" style="cursor: pointer;">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="far fa-file-pdf text-muted"></i>
+              </span>
+              <span class="form-control border-start-0 text-muted d-flex align-items-center">
+                {{ selectedFile()?.name || 'Upload your NGO profile PDF' }}
+              </span>
+              <input type="file" accept="application/pdf" (change)="onFileSelected($event)" hidden />
+            </label>
+          }
+
+          <button type="button" class="btn grant-finder-btn text-nowrap" (click)="findGrants()" [disabled]="!hasCredits()">
+            Find My Grants <i class="fa fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+        @if (!hasCredits()) {
+          <div class="mt-4">
+            <app-no-credits [compact]="true" title="You're out of credits"
+              message="Profile analysis uses AI credits. Add credits to find your best-matched grants."></app-no-credits>
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="d-flex align-items-center gap-2 mt-4 text-muted small">
+      <i class="fa fa-shield"></i>
+      <span>Your data is secure and never shared with third parties.</span>
+    </div>
+
+  </div>
+} @else {
+  <div class="ai-loader d-flex justify-content-center align-items-start pt-5">
+    <div class="card ai-loader-card border-0 shadow-sm text-center p-4 p-md-5">
+
+      <div class="ai-loader-icon-wrap mx-auto mb-4">
+        <div class="ai-loader-icon d-flex align-items-center justify-content-center">
+          <i class="fa fa-magic"></i>
+        </div>
+      </div>
+
+      <h2 class="fw-bold mb-3">AI is finding your best matches</h2>
+      <p class="text-muted mb-4 px-md-3">
+        Analyzing thousands of funding opportunities against your organization's mission and history.
+      </p>
+
+      <div class="ai-loader-progress mb-4 text-start">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="small fw-semibold">Processing</span>
+          <span class="small fw-semibold">{{ progress() }}%</span>
+        </div>
+        <div class="progress ai-loader-progress-bar">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            [style.width.%]="progress()"
+            [attr.aria-valuenow]="progress()"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+      </div>
+
+      <ul class="list-unstyled ai-loader-steps text-start mb-0">
+        @for (step of steps(); track step.id) {
+          <li class="d-flex align-items-center justify-content-between py-2">
+            <div class="d-flex align-items-center gap-3">
+              @if (step.status === 'done') {
+                <span class="ai-loader-step-icon ai-loader-step-icon--done">
+                  <i class="fa fa-check"></i>
+                </span>
+              } @else if (step.status === 'active') {
+                <span class="ai-loader-step-icon ai-loader-step-icon--active">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              } @else if (step.status === 'error') {
+                <span class="ai-loader-step-icon ai-loader-step-icon--error">
+                  <i class="fa fa-times"></i>
+                </span>
+              } @else {
+                <span class="ai-loader-step-icon ai-loader-step-icon--waiting"></span>
+              }
+
+              <span
+                [class.fw-semibold]="step.status === 'active'"
+                [class.text-muted]="step.status === 'waiting'"
+                [class.text-danger]="step.status === 'error'"
+              >
+                {{ step.label }}
+              </span>
+            </div>
+
+            <span
+              class="small fw-semibold"
+              [class.text-success]="step.status === 'done'"
+              [class.ai-loader-active-label]="step.status === 'active'"
+              [class.text-muted]="step.status === 'waiting'"
+              [class.text-danger]="step.status === 'error'"
+            >
+              {{ statusLabel(step.status) }}
+            </span>
+          </li>
+        }
+      </ul>
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger mt-4 mb-0 small text-start" role="alert">
+          <i class="fa fa-exclamation-circle me-2"></i>{{ errorMessage() }}
+        </div>
+        <button type="button" class="btn grant-finder-btn mt-3" (click)="view.set('form')">
+          <i class="fa fa-arrow-left me-1"></i> Try again
+        </button>
+      }
+
+    </div>
+  </div>
+}

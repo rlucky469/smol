@@ -1,0 +1,161 @@
+// dark mode header #242526
+// body #18191a
+// main box bg #272822
+//text-color #f8f8f2
+
+//colors
+
+$primary-clr: #0095c0;
+$secondary-clr: #f8f9fd;
+$white: #ffffff;
+$black: black;
+$Danger-clr: #dc3545;
+$Success-clr: #198754;
+
+//text size
+$smallText: 12px;
+$detailText: 14px;
+$bodyText: 16px;
+$subTitle: 18px;
+$heading: 24px;
+$mainHeading: 32px;
+$lineHeight: 170%;
+$fontFamily: "Poppins", sans-serif;
+$textColor: black;
+$main_spacing: 50px 0;
+
+:root {
+  --bodyFont: 14px;
+  --headingFont: 24px;
+  --subTitleFont: 18px;
+  --detailFont: 16px;
+  --smallFont: 12px;
+
+  --letterSpacing: 0px;
+  --lineHeight: 160%;
+
+  --zoom: 1;
+
+  --textLeft: left;
+  --textRight: right;
+  --textCenter: center;
+  --textJustify: justify;
+
+  --highLightLink: none;
+  --highLightTitle: none;
+  --highLightBoth: none;
+
+  --titleClr: #0095c0;
+  --titleBlackClr: black;
+  --textClr: black;
+  --linkClr: #0095c0;
+
+  --bgClr: #f8f9fd;
+  --searchBox: #0098c233;
+  --primaryClr: #0095c0;
+  --dangerClr: #dc3545;
+  --successClr: #198754;
+
+  --visitedClr:#00c7ff;
+
+  --bgPrimary: #0095c0;
+  --bgPrimaryText: white;
+
+  --bgBlack: black;
+  --bgBlackTextClr: white;
+
+  --bgWhite: white;
+  --bgWhiteTextClr: black;
+
+  --highLightBox: white;
+  --shadow: 0px -1px 8px 0px #e6e9f9e6;
+  --shadow1: 0px -1px 8px 0px #e6e9f9e6;
+
+  --filter: none;
+
+  --fontFamily: Poppins, sans-serif;
+
+  --hoverClr: #0095c0;
+
+  --border: none;
+}
+
+
+
+//paragraph
+@mixin paragraph(
+  $value: null,
+  $color: null,
+  $lineHeight: null,
+  $font: null,
+  $align: null,
+  $fontWeight: null,
+  $ltrSpacing: 0,
+  $outLine: null
+) {
+  font-size: $value;
+  color: $color;
+  line-height: $lineHeight;
+  font-family: $font;
+  text-align: $align;
+  font-weight: $fontWeight;
+  letter-spacing: $ltrSpacing;
+  outline: $outLine;
+}
+
+//spacing
+@mixin spacing($padding: null, $margin: null) {
+  padding: $padding;
+  margin: $margin;
+}
+
+//text clamp
+@mixin textClamp($value, $height: auto) {
+  display: -webkit-box;
+  max-width: 100%;
+  -webkit-line-clamp: $value;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: $height;
+}
+
+//border
+@mixin border($value) {
+  border-radius: $value;
+  -webkit-border-radius: $value;
+  -moz-border-radius: $value;
+  -ms-border-radius: $value;
+  -o-border-radius: $value;
+}
+
+//box-size
+@mixin box($width: null, $height: null) {
+  width: $width;
+  height: $height;
+}
+
+@mixin bgShadow($bg, $shadow) {
+  background: $bg;
+  box-shadow: $shadow;
+}
+
+//position
+@mixin position($position, $top: null, $right: null, $bottom: null, $left: null) {
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+//animation
+$prefixes: "webkit", "moz", "ms", "o", "none";
+@mixin animation($property, $arguments) {
+  @each $prefix in $prefixes {
+    @if $prefix == "none" {
+      #{$property}: $arguments;
+    } @else {
+      -#{$prefix}-#{$property}: $arguments;
+    }
+  }
+}

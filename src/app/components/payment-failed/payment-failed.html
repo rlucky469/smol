@@ -1,0 +1,29 @@
+<section class="pay-section">
+  <div id="logo-box">
+
+    <div class="mb-3">
+      <img src="assets/logo.png" class="logo" alt="fundsforNGOs" />
+    </div>
+
+    <div class="circle-wrapper">
+      <div class="error circle"></div>
+      <div class="icon"><i class="fas fa-times"></i></div>
+    </div>
+
+    <h1 class="heading py-2 text-danger fw-bold mt-2">Payment Not Confirmed</h1>
+    <p class="body_text">
+      We could not confirm your payment, so no credits were added. If money was deducted, your credits will
+      be added automatically once the payment is confirmed.
+    </p>
+
+    <div class="pay-actions">
+      <a routerLink="/plans" class="primary-btnn px-4">Try again</a>
+      <a routerLink="/invoices" class="secondary-btnn px-4">View invoices</a>
+    </div>
+
+    <a [href]="environment.helpDomain + 'premium'" target="_blank" rel="noopener noreferrer" class="pay-support">
+      Need help? Contact support
+    </a>
+
+  </div>
+</section>

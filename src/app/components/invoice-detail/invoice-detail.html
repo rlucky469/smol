@@ -1,0 +1,111 @@
+<div class="invd-overlay" (click)="onBackdrop($event)" role="dialog" aria-modal="true" [attr.aria-label]="'Invoice ' + invoice().invoiceNo">
+  <div class="invd-wrap">
+
+    <!-- Toolbar (hidden while printing) -->
+    <div class="invd-toolbar">
+      <span class="invd-toolbar-label"><i class="far fa-check-circle me-1"></i> Official payment receipt</span>
+      <div class="d-flex gap-2">
+        <button type="button" class="invd-btn invd-btn--primary" (click)="print()">
+          <i class="fas fa-download me-1"></i> Download PDF
+        </button>
+        <button type="button" class="invd-btn invd-btn--close" (click)="closed.emit()" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Invoice sheet -->
+    <div class="invd-sheet">
+      <div class="invd-top">
+        <div>
+          <img src="assets/logo.png" alt="fundsforNGOs" class="invd-logo" />
+          <p class="invd-tagline">International Grant &amp; Proposal Intelligence Platform</p>
+        </div>
+        <div class="invd-title">
+          <h2>INVOICE</h2>
+          <strong>{{ invoice().invoiceNo }}</strong>
+          <span>Reference: {{ invoice().transactionId }}</span>
+        </div>
+      </div>
+
+      <div class="invd-parties">
+        <div>
+          <h4>From</h4>
+          <strong>FUNDSFORNGOS, LLC</strong>
+          <p>1018, 1060 Broadway<br />Albany, New York 12204<br />United States</p>
+        </div>
+        <div>
+          <h4>Billed To</h4>
+          <strong>{{ member.name }}</strong>
+          <p>
+            @if (orgProfile().name) {
+              {{ orgProfile().name }}<br />
+            }
+            @if (member.country) {
+              {{ member.country }}<br />
+            }
+            {{ member.email }}
+          </p>
+        </div>
+      </div>
+
+      <div class="invd-meta">
+        <div>
+          <span>Invoice Date</span>
+          <strong>{{ invoice().date | date: 'MMMM dd, y' }}</strong>
+        </div>
+        <div>
+          <span>Payment Method</span>
+             <strong>
+            <em class="invd-brand">{{ invoice().paymentMethod.brand }}</em>
+            @if (invoice().paymentMethod.last4) { •••• {{ invoice().paymentMethod.last4 }} }
+          </strong>
+        </div>
+        <div>
+          <span>Status</span>
+          <strong><span [class]="'invd-status invd-status--' + invoice().status.toLowerCase()">● {{ invoice().status }}</span></strong>
+        </div>
+      </div>
+
+      <table class="invd-items">
+        <thead>
+          <tr>
+            <th>Item &amp; Description</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Rate</th>
+            <th class="text-end">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong class="invd-item-name">{{ invoice().description }}</strong>
+              <small>{{ invoice().detail }}</small>
+            </td>
+            <td class="text-center">{{ invoice().quantity }}</td>
+            <td class="text-end">{{ invoice().amount | currency: invoice().currency }}</td>
+            <td class="text-end">{{ invoice().amount * invoice().quantity | currency: invoice().currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="invd-totals">
+        <div><span>Subtotal</span><span>{{ invoice().amount * invoice().quantity | currency: invoice().currency }}</span></div>
+        <div><span>Tax (0%)</span><span>{{ 0 | currency: invoice().currency }}</span></div>
+        <div class="invd-grand">
+          <span>{{ invoice().status === 'Paid' ? 'Total Paid' : 'Total Due' }}</span>
+          <span>{{ invoice().amount * invoice().quantity | currency: invoice().currency }}</span>
+        </div>
+      </div>
+
+      <div class="invd-foot">
+        <strong>Thank you for supporting your mission with fundsforNGOs.</strong>
+        <p>
+          This receipt confirms transaction <b>{{ invoice().transactionId }}</b>. For any questions, contact
+          <a [href]="environment.helpDomain + 'premium'" target="_blank" rel="noopener noreferrer"> Support</a>
+         
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

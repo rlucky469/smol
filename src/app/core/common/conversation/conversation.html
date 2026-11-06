@@ -1,0 +1,221 @@
+<!-- Chat Body -->
+<div class="chat-body hide-scrollbar flex-1 h-100" #scrollContainer>
+  <div class="chat-body-inner">
+    <div class="py-5 py-lg-12">
+
+      <!-- Load more button  -->
+      <ng-container *ngIf="(hasMore$ | async) && chatId">
+        <div class="text-center mb-4">
+          <button class="btn btn-sm btn-outline-secondary rounded-pill px-4" (click)="loadMore()">
+            Load earlier messages
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Skeleton  loading  conversation -->
+      <ng-container *ngIf="loading$ | async">
+        <div class="p-3">
+          <ng-container *ngFor="let i of [1, 2, 3]">
+            <div class="message message-out mb-5 d-flex">
+              <div class="user_icon me-2">
+                <div class="placeholder rounded-circle" style="width:35px;height:35px;"></div>
+              </div>
+              <div class="message-inner flex-grow-1">
+                <div class="message-body text-end">
+                  <span class="placeholder col-6 mb-2 d-block"></span>
+                  <span class="placeholder col-8 d-block"></span>
+                </div>
+              </div>
+            </div>
+            <div class="message mb-5 d-flex">
+              <div class="ffnAi_icon me-2">
+                <div class="placeholder rounded-circle" style="width:35px;height:35px;"></div>
+              </div>
+              <div class="message-inner flex-grow-1">
+                <div class="placeholder-glow">
+                  <span class="placeholder col-7 mb-2 d-block"></span>
+                  <span class="placeholder col-8 d-block"></span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <!-- ── Messages ── -->
+      <ng-container *ngIf="!(loading$ | async)">
+        <div *ngFor="let msg of messagesWithHtml; trackBy: trackById">
+
+          <!-- User message -->
+          <div *ngIf="msg.role === 'user'" class="message message-out">
+            <div class="user_icon">
+              <img src="../../../../assets/user.png" alt="You" width="35" />
+            </div>
+            <div class="message-inner">
+              <div class="message-body">
+                <div class="message-content">
+                  <div class="message-text">
+                    <p>{{ msg.content }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assistant message -->
+          <div *ngIf="msg.role === 'assistant'" class="message">
+            <div class="ffnAi_icon">
+              <img src="../../../../assets/logo-icon1.png" alt="FFN AI" width="35" />
+            </div>
+            <div class="message-inner">
+              <div class="message-body">
+                <div class="message-content">
+                  <div class="message-text" [innerHTML]="msg.htmlContent"></div>
+                </div>
+                  <div *ngIf="sourceLinks(msg).length" class="mt-2 small">
+                  <span class="text-muted">Sources:</span>
+                  <a *ngFor="let s of sourceLinks(msg)" [href]="s.url" target="_blank" rel="noopener noreferrer"
+                     class="ms-2 d-block">{{ s.title }}</a>
+                </div>
+
+                <!-- Action bar -->
+                <div class="msg-actions mt-2 d-flex align-items-center gap-2 flex-wrap">
+
+
+                  <!-- Thumbs up -->
+                  <button
+                    class="action-btn"
+                    [class.active-up]="msg.feedbackRating === 'up'"
+                    [disabled]="!!msg.feedbackRating"
+                    title="Good response"
+                    (click)="giveFeedback(msg, 'up')"
+                  >
+                    <i class="fas fa-thumbs-up fa-xs"></i>
+                  </button>
+
+                  <!-- Thumbs down -->
+                  <button
+                    class="action-btn"
+                    [class.active-down]="msg.feedbackRating === 'down'"
+                    [disabled]="!!msg.feedbackRating"
+                    title="Bad response"
+                    (click)="giveFeedback(msg, 'down')"
+                  >
+                    <i class="fas fa-thumbs-down fa-xs"></i>
+                  </button>
+
+                  <!-- Regenerate (only on last assistant message) -->
+                  <button
+                    *ngIf="isLastAssistantMsg(msg)"
+                    class="action-btn"
+                    title="Regenerate response"
+                    [disabled]="!hasCredits()"
+                    (click)="regenerate()"
+                  >
+                    <i class="fas fa-redo-alt fa-xs"></i>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </ng-container>
+
+      <!--AI response loading / streaming -->
+      <ng-container *ngIf="isConversationLoading$ | async">
+        <div class="message">
+          <div class="ffnAi_icon">
+            <img src="../../../../assets/logo-icon1.png" alt="FFN AI" width="35" />
+          </div>
+          <div class="message-inner">
+            <div class="message-body">
+              <div class="message-content">
+
+                <!-- Live streaming text -->
+                <div *ngIf="streamingHtml" class="message-text" [innerHTML]="streamingHtml"></div>
+
+                <!-- Nothing yet: typing dots -->
+                <div *ngIf="!streamingHtml" class="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Chat Header (rename / delete) -->
+<div class="chat-header d-flex align-items-center justify-content-end gap-2 px-3 pt-2" *ngIf="chatId">
+
+  <!-- Rename -->
+  <ng-container *ngIf="!editingTitle; else renameForm">
+    <button class="action-btn" title="Rename chat" (click)="startRename()">
+      <i class="fas fa-pencil-alt fa-sm"></i>
+    </button>
+  </ng-container>
+  <ng-template #renameForm>
+    <div class="d-flex align-items-center gap-1">
+      <input
+        class="form-control form-control-sm rename-input"
+        [(ngModel)]="titleInput"
+        placeholder="New title"
+        (keydown.enter)="saveRename()"
+        (keydown.escape)="editingTitle = false"
+        autofocus
+      />
+      <button class="btn btn-sm btn-primary" (click)="saveRename()">Save</button>
+      <button class="btn btn-sm btn-link text-secondary p-0" (click)="editingTitle = false">Cancel</button>
+    </div>
+  </ng-template>
+
+  <!-- Delete session -->
+  <button class="action-btn text-danger" title="Delete chat" (click)="deleteSession()">
+    <i class="fas fa-trash fa-sm"></i>
+  </button>
+</div>
+
+ <!-- Chat Footer -->
+<div class="chat-footer pb-3 pb-lg-7 position-absolute bottom-0 start-0">
+  <div class="chat-box">
+    @if (hasCredits()) {
+    <div class="chat-input-wrapper border rounded-4 p-2 shadow-sm">
+      <textarea
+        [(ngModel)]="message"
+        placeholder="Ask anything…"
+        rows="3"
+        #autoResize
+        (input)="resizeTextarea(autoResize)"
+        (keydown.enter)="$event.preventDefault(); Chat()"
+        class="form-control border-0 flex-grow-1 px-3 no-resize outline-0 shadow-none"
+      ></textarea>
+
+      <div class="text-end d-flex align-items-center justify-content-end gap-2">
+
+        <!-- Send -->
+        <button
+          class="prmary-btn1 p-0"
+          [class.disabled]="!message.trim()"
+          (click)="Chat()"
+          [disabled]="!message.trim()"
+          title="Send"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+    } @else {
+    <app-no-credits
+      title="You're out of credits"
+      message="Your chat history is still available. Add credits to send new messages."
+    ></app-no-credits>
+    }
+  </div>
+</div>

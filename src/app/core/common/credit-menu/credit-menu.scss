@@ -1,0 +1,152 @@
+:host {
+  position: relative;
+  list-style: none;
+  padding: 3px 10px;
+}
+
+.credit-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--bgPrimaryText);
+  border: none;
+  border-radius: 999px;
+  padding: 1px 12px;
+  font-family: var(--fontFamily);
+  font-size: var(--smallFont);
+  font-weight: 600;
+  line-height: var(--lineHeight);
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  &--low i {
+    color: #ffc021;
+  }
+
+  &--empty i {
+    color: #ffb3b3;
+  }
+}
+
+.credit-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffc021;
+  border: 1px solid var(--bgPrimaryText);
+}
+
+.credit-pill--empty .credit-dot {
+  background: var(--dangerClr);
+}
+
+.credit-panel {
+  width: 290px;
+  padding: 16px;
+  border: 1px solid #eceef5;
+  border-radius: 12px;
+  background: var(--highLightBox);
+  box-shadow: 0 10px 30px rgba(20, 24, 40, 0.12);
+  font-family: var(--fontFamily);
+  color: var(--textClr);
+}
+
+.credit-panel-label {
+  font-size: var(--smallFont);
+  font-weight: 600;
+}
+
+.credit-panel-value {
+  font-size: var(--bodyFont);
+  font-weight: 700;
+  color: var(--primaryClr);
+}
+
+.credit-meter {
+  height: 6px;
+  border-radius: 999px;
+  background: #e4e7f2;
+  margin: 12px 0 8px;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--primaryClr);
+    transition: width 0.3s ease;
+  }
+
+  &--low span {
+    background: #f39c12;
+  }
+
+  &--empty span {
+    background: var(--dangerClr);
+  }
+}
+
+.credit-panel-meta {
+  font-size: 11px;
+  opacity: 0.65;
+  margin-bottom: 14px;
+}
+
+.credit-btn {
+  display: block;
+  text-align: center;
+  font-size: var(--smallFont);
+  font-weight: 600;
+  padding: 9px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-bottom: 8px;
+
+  &--primary {
+    background: var(--primaryClr);
+    color: var(--bgPrimaryText);
+
+    &:hover {
+      opacity: 0.9;
+      color: var(--bgPrimaryText);
+    }
+  }
+
+  &--outline {
+    border: 1px solid #dcdfea;
+    color: var(--textClr);
+
+    &:hover {
+      border-color: var(--primaryClr);
+      color: var(--primaryClr);
+    }
+  }
+}
+
+.credit-panel-links {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #eceef5;
+  padding-top: 10px;
+  margin-top: 4px;
+
+  a {
+    font-size: 11px;
+    color: var(--textClr);
+    opacity: 0.7;
+    text-decoration: none;
+
+    &:hover {
+      opacity: 1;
+      color: var(--primaryClr);
+    }
+  }
+}

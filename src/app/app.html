@@ -1,0 +1,28 @@
+@if (isLoggedIn) {
+  <main id="main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-theme-switcher></app-theme-switcher>
+}
+
+<!-- Accessibility overlays driven by the theme switcher -->
+@if (themeService.acsbSettings.readingGuide) {
+  <div id="reading-guide" class="reading-guide"></div>
+}
+
+@if (themeService.acsbSettings.readingMask) {
+  <div id="reading-mask-top" class="reading-mask-top"></div>
+  <div id="reading-mask-bottom" class="reading-mask-bottom"></div>
+}
+
+@if (themeService.acsbSettings.textMagnifier) {
+  <div id="text-magnifie-tooltip" class="text-magnifie-tooltip" style="visibility: hidden"></div>
+}
+
+<div id="text-to-speech" class="text-to-speech" data-id="text-to-speech" (click)="speak()">
+  <i class="fas fa-volume-up" data-id="text-to-speech"></i>
+  <span class="bottom-shape" data-id="text-to-speech"></span>
+</div>
+
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

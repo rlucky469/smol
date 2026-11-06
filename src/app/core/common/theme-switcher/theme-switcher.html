@@ -1,0 +1,260 @@
+@if (toggleBox) {
+<div class="acsb_box">
+  <div class="acsb_box_header">
+    <div class="d-flex align-items-center">
+      <h3 class="adabundle-menu-title">Accessibility Menu</h3>
+      <i (click)="toggleBox = false" class="fas fa-times ms-auto" role="button" aria-label="Close"></i>
+    </div>
+  </div>
+
+  <div class="acsd_box_body noselect">
+
+    <!-- Accessibility profiles -->
+    <div class="acsb-actions">
+      <div class="acsb-box">
+        <div class="acsb-actions-title py-3">Choose the right accessibility profile for you</div>
+
+        @for (p of profiles; track p.key) {
+        <div class="acsb-row" (click)="toggleProfile(p.key)" [class.active]="settings[p.key]">
+          <div class="d-flex align-items-center">
+            <div class="acsb-toggle me-4">
+              <span class="switch shadow-sm switch-medium" [class.checked]="settings[p.key]">
+                <small>{{ settings[p.key] ? 'ON' : 'OFF' }}</small>
+              </span>
+            </div>
+            <div class="acsb-profile-content">
+              <h6 class="title">{{ p.title }}</h6>
+              <p class="acsb-profile-text">{{ p.text }}</p>
+            </div>
+            <div class="acsb-profile-icon ms-auto">
+              <i [class]="p.icon"></i>
+            </div>
+          </div>
+          @if (settings[p.key]) {
+          <div class="acsb-profile-description">{{ p.description }}</div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Content Adjustments -->
+    <div class="acsb-actions">
+      <div class="acsb-box">
+        <div class="acsb-actions-title py-3">Content Adjustments</div>
+
+        <div class="d-flex">
+          <ng-container *ngTemplateOutlet="stepper; context: { title: 'Content Scaling', icon: 'fas fa-expand-arrows-alt', key: 'contentScaling' }"></ng-container>
+          <div (click)="themeService.changeFont('Readable')" class="feature-box1 ms-auto px-2" [class.active]="settings.readableFont">
+            <div class="box-title"><img src="assets/accessibility-icon/font.png" alt="Readable Font"></div>
+            <div class="box-content"><p>Readable Font</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div (click)="themeService.highlight('--highLightTitle')" class="feature-box1 px-2" [class.active]="settings.highlightTitles">
+            <div class="box-title"><img src="assets/accessibility-icon/underline.png" alt="Highlight Titles"></div>
+            <div class="box-content"><p>Highlight Titles</p></div>
+          </div>
+          <div (click)="themeService.highlight('--highLightLink')" class="feature-box1 ms-auto px-2" [class.active]="settings.highlightLinks">
+            <div class="box-title"><img src="assets/accessibility-icon/link.png" alt="Highlight Links"></div>
+            <div class="box-content"><p>Highlight Links</p></div>
+          </div>
+          <div (click)="toggleSetting('textMagnifier')" class="feature-box1 ms-auto px-2" [class.active]="settings.textMagnifier">
+            <div class="box-title"><img src="assets/accessibility-icon/zoom.png" alt="Text Magnifier"></div>
+            <div class="box-content"><p>Text Magnifier</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <ng-container *ngTemplateOutlet="stepper; context: { title: 'Adjust Font Sizing', icon: 'fas fa-sort-alt', key: 'fontSize' }"></ng-container>
+          <div (click)="themeService.textAlignChange('center')" class="feature-box1 ms-auto px-2" [class.active]="settings.textAlign === 'center'">
+            <div class="box-title"><img src="assets/accessibility-icon/format.png" alt="Align Center"></div>
+            <div class="box-content"><p>Align Center</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <ng-container *ngTemplateOutlet="stepper; context: { title: 'Adjust Line Height', icon: 'fas fa-sort-alt', key: 'lineHeight' }"></ng-container>
+          <div (click)="themeService.textAlignChange('left')" class="feature-box1 ms-auto px-2" [class.active]="settings.textAlign === 'left'">
+            <div class="box-title"><img src="assets/accessibility-icon/align-left.png" alt="Align Left"></div>
+            <div class="box-content"><p>Align Left</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <ng-container *ngTemplateOutlet="stepper; context: { title: 'Adjust Letter Spacing', icon: 'fas fa-sort-alt', key: 'letterSpacing' }"></ng-container>
+          <div (click)="themeService.textAlignChange('right')" class="feature-box1 ms-auto px-2" [class.active]="settings.textAlign === 'right'">
+            <div class="box-title"><img src="assets/accessibility-icon/align-right.png" alt="Align Right"></div>
+            <div class="box-content"><p>Align Right</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Adjustments -->
+    <div class="acsb-actions">
+      <div class="acsb-box">
+        <div class="acsb-actions-title py-3">Color Adjustments</div>
+
+        <div class="d-flex">
+          <div class="feature-box1 px-2" (click)="themeService.darkMode()" [class.active]="settings.themeColor === 'dark'">
+            <div class="box-title"><img src="assets/accessibility-icon/moon.png" alt="Dark Contrast"></div>
+            <div class="box-content"><p>Dark Contrast</p></div>
+          </div>
+          <div class="feature-box1 ms-auto px-2" (click)="themeService.lightMode()" [class.active]="settings.themeColor === 'light'">
+            <div class="box-title"><img src="assets/accessibility-icon/brightness.png" alt="Light Contrast"></div>
+            <div class="box-content"><p>Light Contrast</p></div>
+          </div>
+          <div class="feature-box1 ms-auto px-2" (click)="themeService.saturation('contrast')" [class.active]="settings.themeColor === 'contrast'">
+            <div class="box-title"><img src="assets/accessibility-icon/contrast.png" alt="High Contrast"></div>
+            <div class="box-content"><p>High Contrast</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div class="feature-box1" (click)="themeService.saturation('high')" [class.active]="settings.themeColor === 'high'">
+            <div class="box-title"><img src="assets/accessibility-icon/saturation.png" alt="High Saturation"></div>
+            <div class="box-content"><p>High Saturation</p></div>
+          </div>
+          <ng-container *ngTemplateOutlet="colorPicker; context: { title: 'Adjust Text Colors', cat: 'text', key: '--textClr', selected: settings.textColor }"></ng-container>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div class="feature-box1" (click)="themeService.saturation('grayscale')" [class.active]="settings.themeColor === 'grayscale'">
+            <div class="box-title"><img src="assets/accessibility-icon/opacity.png" alt="Monochrome"></div>
+            <div class="box-content"><p>Monochrome</p></div>
+          </div>
+          <ng-container *ngTemplateOutlet="colorPicker; context: { title: 'Adjust Title Colors', cat: 'title', key: '--titleClr', selected: settings.titleColor }"></ng-container>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div class="feature-box1" (click)="themeService.saturation('low')" [class.active]="settings.themeColor === 'low'">
+            <div class="box-title"><img src="assets/accessibility-icon/low-saturation.png" alt="Low Saturation"></div>
+            <div class="box-content"><p>Low Saturation</p></div>
+          </div>
+          <ng-container *ngTemplateOutlet="colorPicker; context: { title: 'Adjust Background Colors', cat: 'bg', key: '--bgClr', selected: settings.bgColor }"></ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orientation Adjustments -->
+    <div class="acsb-actions">
+      <div class="acsb-box">
+        <div class="acsb-actions-title py-3">Orientation Adjustments</div>
+
+        <div class="d-flex">
+          <div (click)="themeService.muteSounds()" class="feature-box1 px-2" [class.active]="settings.muteSounds">
+            <div class="box-title"><img src="assets/accessibility-icon/mute.png" alt="Mute Sounds"></div>
+            <div class="box-content"><p>Mute Sounds</p></div>
+          </div>
+          <div (click)="themeService.hideImages()" class="feature-box1 ms-auto px-2" [class.active]="settings.hideImages">
+            <div class="box-title"><img src="assets/accessibility-icon/delete.png" alt="Hide Images"></div>
+            <div class="box-content"><p>Hide Images</p></div>
+          </div>
+          <div (click)="toggleSetting('readingGuide')" class="feature-box1 ms-auto px-2" [class.active]="settings.readingGuide">
+            <div class="box-title"><img src="assets/accessibility-icon/reading-guide.png" alt="Reading Guide"></div>
+            <div class="box-content"><p>Reading Guide</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div (click)="themeService.stopAnimation()" class="feature-box1 px-2" [class.active]="settings.stopAnimations">
+            <div class="box-title"><img src="assets/accessibility-icon/motion-graphic.png" alt="Stop Animations"></div>
+            <div class="box-content"><p>Stop Animations</p></div>
+          </div>
+          <div (click)="toggleSetting('readingMask')" class="feature-box1 ms-auto px-2" [class.active]="settings.readingMask">
+            <div class="box-title"><img src="assets/accessibility-icon/reading-mask.png" alt="Reading Mask"></div>
+            <div class="box-content"><p>Reading Mask</p></div>
+          </div>
+          <div (click)="themeService.highlightHover()" class="feature-box1 ms-auto px-2" [class.active]="settings.highlightHover">
+            <div class="box-title"><img src="assets/accessibility-icon/hashtag.png" alt="Highlight Hover"></div>
+            <div class="box-content"><p>Highlight Hover</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div (click)="themeService.highlightFocus()" class="feature-box1 px-2" [class.active]="settings.highlightFocus">
+            <div class="box-title"><img src="assets/accessibility-icon/target.png" alt="Highlight Focus"></div>
+            <div class="box-content"><p>Highlight Focus</p></div>
+          </div>
+          <div (click)="themeService.cursorChange('big-black-cursor', 'bigBlackCursor')" class="feature-box1 ms-auto px-2" [class.active]="settings.bigBlackCursor">
+            <div class="box-title"><img src="assets/accessibility-icon/pointer.png" alt="Big Black Cursor"></div>
+            <div class="box-content"><p>Big Black Cursor</p></div>
+          </div>
+          <div (click)="themeService.cursorChange('big-white-cursor', 'bigWhiteCursor')" class="feature-box1 ms-auto px-2" [class.active]="settings.bigWhiteCursor">
+            <div class="box-title"><img src="assets/accessibility-icon/clicker.png" alt="Big White Cursor"></div>
+            <div class="box-content"><p>Big White Cursor</p></div>
+          </div>
+        </div>
+
+        <div class="d-flex mt-4">
+          <div (click)="themeService.virtualKeyboard()" class="feature-box1 px-2" [class.active]="settings.virtualKeyboard">
+            <div class="box-title"><img src="assets/accessibility-icon/keyboard.png" alt="Virtual Keyboard"></div>
+            <div class="box-content"><p>Virtual Keyboard</p></div>
+          </div>
+          <div (click)="toggleSetting('textSpeech')" class="feature-box1 ms-3 px-2" [class.active]="settings.textSpeech">
+            <div class="box-title"><img src="assets/accessibility-icon/ear.png" alt="Text to Speech"></div>
+            <div class="box-content"><p>Text to Speech</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acsd_box_footer bg-light shadow px-3 py-2 border">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-primary" (click)="save()" placement="top" ngbTooltip="Save my Preferences">Save</button>
+      <button class="ms-3 btn btn-danger" (click)="reset()">Reset</button>
+    </div>
+  </div>
+</div>
+}
+
+<div class="acsb-trigger" (click)="toggleBox = !toggleBox" role="button" aria-label="Accessibility menu">
+  <span><i class="fab fa-accessible-icon"></i></span>
+</div>
+
+<!-- Stepper box (scaling, font size, line height, letter spacing) -->
+<ng-template #stepper let-title="title" let-icon="icon" let-key="key">
+  <div class="feature-box">
+    <div class="box-title">
+      <h6><i [class]="icon"></i> {{ title }}</h6>
+    </div>
+    <div class="box-content">
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button (click)="key === 'contentScaling' ? themeService.contentScaling('inc') : key === 'fontSize' ? themeService.fontSizing('inc') : key === 'lineHeight' ? themeService.lineHeight('inc') : themeService.ltrSpacing('inc')"
+            type="button" class="btn btn-default btn-number left">
+            <i class="fas fa-angle-up"></i>
+          </button>
+        </span>
+        <input type="text" class="form-control input-number" [value]="stepLabel(key)" disabled>
+        <span class="input-group-btn">
+          <button (click)="key === 'contentScaling' ? themeService.contentScaling('dec') : key === 'fontSize' ? themeService.fontSizing('dec') : key === 'lineHeight' ? themeService.lineHeight('dec') : themeService.ltrSpacing('dec')"
+            type="button" class="btn btn-default btn-number right">
+            <i class="fas fa-angle-down"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Color picker box -->
+<ng-template #colorPicker let-title="title" let-cat="cat" let-key="key" let-selected="selected">
+  <div class="feature-box px-2 ms-auto">
+    <div class="box-title">
+      <h6>{{ title }}</h6>
+    </div>
+    <div class="box-content">
+      <div class="color-box">
+        @for (color of colors; track color) {
+        <span (click)="themeService.changeColor(cat, key, color)" [class]="'color ' + colorClass(color, selected)"
+          [style.background-color]="color" [attr.aria-label]="'Change color to ' + color"></span>
+        }
+      </div>
+      <p class="mb-0 mt-2" role="button" (click)="themeService.changeColor(cat, key, selected)">Cancel</p>
+    </div>
+  </div>
+</ng-template>

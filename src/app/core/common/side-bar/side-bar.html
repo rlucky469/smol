@@ -1,0 +1,122 @@
+<aside class="sb" [class.sb--mini]="isSideBarMini">
+
+  <!-- Top: logo + collapse -->
+  <div class="sb-top">
+    <a [href]="environment.dashboardDomain" class="sb-logo" title="Back to Dashboard">
+      <img src="assets/logo-icon1.png" alt="fundsforNGOs" />
+    </a>
+    <button type="button" class="sb-icon-btn sb-toggle" (click)="handleChange()"
+      [title]="isSideBarMini ? 'Expand sidebar' : 'Collapse sidebar'">
+      <img [src]="isSideBarMini ? 'assets/sidebar.svg' : 'assets/sidebar1.svg'" alt="" width="26" height="26" />
+    </button>
+    <button type="button" class="sb-icon-btn sb-close-mobile" (click)="handleToggleChange()" title="Close">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Links + history -->
+  <div class="sb-scroll" infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="300"
+    [scrollWindow]="false" (scrolled)="onScroll()">
+
+    <a routerLink="/app" class="sb-link" title="New Chat">
+      <i class="far fa-edit"></i>
+      @if (!isSideBarMini) {<span>New Chat</span>}
+    </a>
+
+    <div class="sb-divider"></div>
+
+    <a routerLink="/grant-list" class="sb-link" title="Discover Grants">
+      <i class="fas fa-search"></i>
+      @if (!isSideBarMini) {<span>Discover Grants</span>}
+    </a>
+    <a routerLink="/analyze-profile" class="sb-link" title="AI Grant Finder">
+      <i class="fas fa-magic"></i>
+      @if (!isSideBarMini) {<span>AI Grant Finder</span>}
+    </a>
+    <a routerLink="/plans" class="sb-link" title="Plans & Credits">
+      <i class="far fa-gem"></i>
+      @if (!isSideBarMini) {<span>Plans &amp; Credits</span>}
+    </a>
+
+    @if (!isSideBarMini) {
+      @for (section of groupedChats(); track section.group) {
+        <h4 class="sb-label">{{ section.group }}</h4>
+
+        @for (chat of section.chats; track chat.id) {
+          <div class="sb-chat">
+            <a [routerLink]="'/app/' + chat.id" routerLinkActive="sb-chat-link--active" class="sb-chat-link">
+              <p class="clamp-1 mb-0" [innerHTML]="convertToHtmlFormat(chat.title)"></p>
+            </a>
+            <div ngbDropdown container="body" placement="bottom-end" class="sb-chat-menu">
+              <button type="button" class="sb-icon-btn sb-icon-btn--sm" ngbDropdownToggle [attr.aria-label]="'Options for ' + chat.title">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div ngbDropdownMenu class="sb-dropdown">
+                <button ngbDropdownItem type="button" class="text-danger" (click)="handleDelete($event, chat.id)">
+                  @if (!(deleteLoading$ | async)) {
+                    <i class="fas fa-trash-alt me-2"></i> Delete
+                  } @else {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      @if (loading$ | async) {
+        <div class="placeholder-glow px-2 mt-3">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <span class="placeholder col-12 mb-3 rounded"></span>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Wallet card -->
+  <div class="sb-wallet" [class.sb-wallet--low]="isLow()" [class.sb-wallet--empty]="isEmpty()">
+    @if (!isSideBarMini) {
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="sb-wallet-balance">
+          <i class="fas fa-bolt"></i>
+          <span>{{ walletLoaded() ? (available() | number) : '—' }}</span>
+          <small>credits</small>
+        </div>
+        <a routerLink="/plans" class="sb-topup">+ Top up</a>
+      </div>
+      <div class="sb-meter"><span [style.width.%]="remainingPercent()"></span></div>
+      <div class="sb-wallet-meta">
+        <span>{{ nextExpiry() ? 'Expires ' + (nextExpiry() | date: 'MMM d, y') : 'AI credits' }}</span>
+        <a routerLink="/invoices">History</a>
+      </div>
+    } @else {
+      <a routerLink="/plans" class="sb-wallet-mini" title="AI credits">
+        @if (isLow() || isEmpty()) {<span class="sb-dot"></span>}
+        <i class="fas fa-bolt"></i>
+        <span>{{ walletLoaded() ? (available() | number) : '—' }}</span>
+      </a>
+    }
+  </div>
+
+  <!-- User card -->
+  <div ngbDropdown placement="top-start" container="body" class="sb-user-wrap">
+    <button type="button" class="sb-user" ngbDropdownToggle>
+      <span class="sb-avatar"><i class="fa fa-user"></i></span>
+      @if (!isSideBarMini) {
+        <span class="sb-user-info">
+          <b class="clamp-1">{{ memberInfo.name }}</b>
+          <small class="clamp-1">{{ memberInfo.email }}</small>
+        </span>
+      }
+    </button>
+    <div ngbDropdownMenu class="sb-dropdown sb-user-menu">
+      <a ngbDropdownItem [href]="environment.dashboardDomain"><i class="fas fa-home-alt me-2"></i> Dashboard</a>
+      <a ngbDropdownItem routerLink="/plans"><i class="far fa-gem me-2"></i> Plans &amp; Credits</a>
+      <a ngbDropdownItem routerLink="/invoices"><i class="far fa-file-alt me-2"></i> Invoices</a>
+      <a ngbDropdownItem [href]="environment.helpDomain + 'premium'"><i class="fa fa-envelope me-2"></i> Support</a>
+      <button ngbDropdownItem type="button" class="text-danger" (click)="logOut()"><i class="fa fa-sign-out-alt me-2"></i> Sign out</button>
+    </div>
+  </div>
+</aside>

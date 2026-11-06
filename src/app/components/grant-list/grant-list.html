@@ -1,0 +1,273 @@
+<app-bread-crumbs title="Discover Grants"></app-bread-crumbs>
+
+<div class="grant-page py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+
+        <div class="grant-page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+              <h1 class="fw-bold mb-1">Discover Grants</h1>
+              <p class="text-muted mb-0">Find and match with the perfect funding opportunities for your mission.</p>
+            </div>
+            <span class="grant-showing-badge">
+              <span class="grant-showing-dot"></span>
+              Showing {{ stats().totalMatches }} available grants
+            </span>
+          </div>
+
+          <!-- Search -->
+          <div class="grant-search-bar mt-4 d-flex align-items-center gap-3">
+            <div class="grant-search-input flex-grow-1 d-flex align-items-center">
+              <i class="fa fa-search text-muted"></i>
+              <input type="text" class="form-control border-0" placeholder="Search grants..."
+                [(ngModel)]="searchInput" (keydown.enter)="onSearch()" />
+              <span class="grant-search-hint d-none d-md-inline"><i class="fas fa-bolt me-1"></i>AI search uses credits</span>
+            </div>
+            <button class="btn grant-search-btn" type="button" (click)="onSearch()" [disabled]="isLoading()">
+              <i class="fa fa-search me-1"></i> Search
+            </button>
+          </div>
+
+          @if (!hasCredits()) {
+          <div class="mt-3">
+            <app-no-credits [compact]="true" title="You're out of credits"
+              message="Browsing and filters still work. Add credits to run AI searches."></app-no-credits>
+          </div>
+          }
+
+          <!-- Filter pills -->
+          <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+
+            <!-- Sort -->
+            <div ngbDropdown class="d-inline-block">
+              <button class="btn grant-pill grant-pill--active" type="button" ngbDropdownToggle>
+                <i class="fa fa-sliders me-1"></i> {{ filters().sortBy }}
+              </button>
+              <div ngbDropdownMenu class="grant-dropdown-menu">
+                @for (opt of sortOptions; track opt) {
+                <button ngbDropdownItem type="button" class="grant-dropdown-item" [class.active]="opt === filters().sortBy"
+                  (click)="setFilter('sortBy', opt)">
+                  {{ opt }}
+                  @if (opt === filters().sortBy) { <i class="fa fa-check"></i> }
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Amount -->
+            <div ngbDropdown class="d-inline-block">
+              <button class="btn grant-pill" type="button" ngbDropdownToggle>
+                {{ filters().amount }}
+              </button>
+              <div ngbDropdownMenu class="grant-dropdown-menu">
+                @for (opt of amountOptions; track opt) {
+                <button ngbDropdownItem type="button" class="grant-dropdown-item"
+                  [class.active]="opt === filters().amount" (click)="setFilter('amount', opt)">
+                  {{ opt }}
+                  @if (opt === filters().amount) { <i class="fa fa-check"></i> }
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Match -->
+            <div ngbDropdown class="d-inline-block">
+              <button class="btn grant-pill" type="button" ngbDropdownToggle>
+                {{ filters().match }}
+              </button>
+              <div ngbDropdownMenu class="grant-dropdown-menu">
+                @for (opt of matchOptions; track opt) {
+                <button ngbDropdownItem type="button" class="grant-dropdown-item" [class.active]="opt === filters().match"
+                  (click)="setFilter('match', opt)">
+                  {{ opt }}
+                  @if (opt === filters().match) { <i class="fa fa-check"></i> }
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Type -->
+            <div ngbDropdown class="d-inline-block">
+              <button class="btn grant-pill" type="button" ngbDropdownToggle>
+                {{ filters().type }}
+              </button>
+              <div ngbDropdownMenu class="grant-dropdown-menu">
+                @for (opt of typeOptions; track opt) {
+                <button ngbDropdownItem type="button" class="grant-dropdown-item" [class.active]="opt === filters().type"
+                  (click)="setFilter('type', opt)">
+                  {{ opt }}
+                  @if (opt === filters().type) { <i class="fa fa-check"></i> }
+                </button>
+                }
+              </div>
+            </div>
+
+          </div>
+
+          @if (activeFilters().length) {
+          <div class="d-flex align-items-center gap-2 flex-wrap mt-3">
+            <span class="text-muted small">Active filters:</span>
+            @for (chip of activeFilters(); track chip.key) {
+            <span class="grant-filter-chip">
+              {{ chip.label }}
+              <i class="fa fa-times ms-1" (click)="removeFilter(chip)"></i>
+            </span>
+            }
+            <span class="grant-clear-all" role="button" (click)="clearAllFilters()">Clear all</span>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="grant-page-body mt-5">
+        <div class="row g-4">
+
+          <!-- Sidebar -->
+          <div class="col-lg-3">
+            <app-active-profile [profile]="profile()" [initialCountryIds]="initialCountryIds()"
+              [initialIssueIds]="initialIssueIds()" (save)="onProfileSave($event)"></app-active-profile>
+          </div>
+
+          <!-- Main content -->
+          <div class="col-lg-9">
+
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="grant-stat-card">
+                  <span class="grant-stat-label">Total Matches</span>
+                  <span class="grant-stat-value grant-stat-value--highlight">{{ stats().totalMatches }}</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="grant-stat-card">
+                  <span class="grant-stat-label">High Match Score</span>
+                  <span class="grant-stat-value text-success">{{ stats().highMatchScore }}%</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="grant-stat-card">
+                  <span class="grant-stat-label">Available Funding</span>
+                  <span class="grant-stat-value">{{ stats().availableFunding }}</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="grant-stat-card">
+                  <span class="grant-stat-label">Upcoming Deadlines</span>
+                  <span class="grant-stat-value text-warning">{{ stats().upcomingDeadlines }}</span>
+                </div>
+              </div>
+            </div>
+
+            @if (isLoading()) {
+            <div class="row g-3">
+              @for (i of [0,1,2,3,4,5]; track $index) {
+              <div class="col-md-6 col-xl-4">
+                <div class="grant-card h-100 d-flex flex-column placeholder-glow">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="placeholder col-8 rounded" style="height: 20px;"></span>
+                    <span class="placeholder rounded-circle" style="width: 52px; height: 52px;"></span>
+                  </div>
+                  <span class="placeholder col-5 mb-3 rounded"></span>
+                  <span class="placeholder col-6 mb-2 rounded"></span>
+                  <span class="placeholder col-9 mb-3 rounded"></span>
+                  <div class="d-flex gap-2 mb-3">
+                    <span class="placeholder col-3 rounded-pill"></span>
+                    <span class="placeholder col-3 rounded-pill"></span>
+                  </div>
+                  <span class="placeholder col-12 mb-1 rounded"></span>
+                  <span class="placeholder col-10 mb-4 rounded"></span>
+                  <div class="d-flex gap-2 mt-auto">
+                    <span class="placeholder col-6 rounded" style="height: 38px;"></span>
+                    <span class="placeholder col-6 rounded" style="height: 38px;"></span>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            } @else {
+            <div class="row g-3">
+              @for (grant of grants(); track grant.id) {
+              <div class="col-md-6 col-xl-4">
+                <div class="grant-card h-100 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="fw-bold grant-card-title mb-0" (click)="viewDetails(grant)">{{ grant.title }}</h5>
+                    <div class="grant-score" [class.grant-score--fair]="grant.matchLabel === 'Fair'"
+                      [style.--score]="grant.matchScore">
+                      <span>{{ grant.matchScore }}% </span>
+                    </div>
+                  </div>
+
+                  <div class="grant-score-label mb-2" [class.text-primary]="grant.matchLabel === 'Fair'">
+                    AI Score • {{ grant.matchLabel }}
+                  </div>
+
+                  <div class="d-bloc text-muted small mb-2">
+                    <i class="fa fa-building me-1"></i>
+                    <span>{{ grant.funder }}</span>
+                  </div>
+
+                  <span class="d-block grant-deadline small mb-2 text-muted">
+                    <i class="fa fa-wallet me-1"></i> {{ grant.amountLabel }}
+                  </span>
+
+                  <span class="d-block grant-deadline small mb-2">
+                    <i class="fa fa-calendar me-1"></i> {{ grant.deadlineLabel }}
+                  </span>
+
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    @for (tag of grant.tags.slice(0, 3); track tag) {
+                    <span class="grant-tag">{{ tag }}</span>
+                    }
+                    @if (grant.tags.length > 3) {
+                    <span class="grant-tag grant-tag--more">+{{ grant.tags.length - 3 }} more</span>
+                    }
+                  </div>
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="grant-tag grant-tag--donor">Type : {{ grant.donorTypeLabel }}</span>
+                  </div>
+
+                  <ul class="grant-bullets small mb-4 flex-grow-1">
+                    @for (bullet of grant.bullets; track bullet) {
+                    <li>{{ bullet }}</li>
+                    }
+                  </ul>
+
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn grant-view-btn flex-grow-1" (click)="viewDetails(grant)">
+                      View Details
+                    </button>
+                    <button type="button" class="btn grant-save-btn flex-grow-1" (click)="saveGrant(grant)">
+                      <i class="fa fa-bookmark me-1"></i> Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+              } @empty {
+              <div class="col-12">
+                <div class="grant-empty text-center py-5">
+                  <i class="fa fa-search mb-3"></i>
+                  <h5 class="fw-bold">No grants found</h5>
+                  <p class="text-muted mb-0">Try changing your search or filters.</p>
+                </div>
+              </div>
+              }
+            </div>
+
+            @if (stats().totalMatches > pageSize()) {
+            <div class="d-flex justify-content-center mt-4">
+              <ngb-pagination [collectionSize]="stats().totalMatches" [page]="currentPage()" [pageSize]="pageSize()"
+                [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                (pageChange)="onPageChange($event)"></ngb-pagination>
+            </div>
+            }
+            }
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

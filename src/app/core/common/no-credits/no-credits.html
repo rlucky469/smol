@@ -1,0 +1,8 @@
+<div class="no-credits" [class.no-credits--compact]="compact()" role="alert">
+  <span class="no-credits-icon"><i class="fas fa-bolt"></i></span>
+  <div class="flex-grow-1">
+    <h6 class="no-credits-title">{{ title() }}</h6>
+    <p class="no-credits-text">{{ message() }}</p>
+  </div>
+  <a routerLink="/plans" class="no-credits-btn">Buy Credits</a>
+</div>

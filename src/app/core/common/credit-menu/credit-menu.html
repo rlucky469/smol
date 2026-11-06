@@ -1,0 +1,46 @@
+<div ngbDropdown display="dynamic" placement="bottom-end" class="credit-menu">
+  <button
+    type="button"
+    class="credit-pill"
+    [class.credit-pill--low]="isLow()"
+    [class.credit-pill--empty]="isEmpty()"
+    ngbDropdownToggle
+    aria-label="AI credits"
+  >
+    <i class="fas fa-bolt"></i>
+    @if (loaded()) {
+      {{ available() | number }} Credits
+    } @else {
+      Credits
+    }
+    @if (isLow() || isEmpty()) {
+      <span class="credit-dot"></span>
+    }
+  </button>
+
+  <div ngbDropdownMenu class="credit-panel">
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="credit-panel-label">Available Balance</span>
+      <span class="credit-panel-value" [class.text-danger]="isEmpty()">{{ available() | number }} credits</span>
+    </div>
+
+    <div class="credit-meter" [class.credit-meter--low]="isLow()" [class.credit-meter--empty]="isEmpty()">
+      <span [style.width.%]="remainingPercent()"></span>
+    </div>
+
+    <div class="d-flex justify-content-between credit-panel-meta">
+      <span>{{ used() | number }} of {{ total() | number }} used</span>
+      @if (nextExpiry()) {
+        <span>Expires {{ nextExpiry() | date: 'MMM d, y' }}</span>
+      }
+    </div>
+
+    <a routerLink="/plans" class="credit-btn credit-btn--primary">Buy Credits</a>
+
+
+    <div class="credit-panel-links">
+      <a routerLink="/plans"><i class="far fa-gem me-1"></i> Plans</a>
+      <a routerLink="/invoices"><i class="far fa-file-alt me-1"></i> Invoices</a>
+    </div>
+  </div>
+</div>

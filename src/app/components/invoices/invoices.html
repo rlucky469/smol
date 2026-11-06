@@ -1,0 +1,167 @@
+<app-bread-crumbs title="Invoices"></app-bread-crumbs>
+
+<div class="inv-page py-5">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div>
+        <h1 class="fw-bold mb-1 inv-title">Invoices</h1>
+        <p class="text-muted mb-0">Download and manage your billing history and credit top ups.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <!-- <a class="btn inv-btn-outline" [href]="environment.helpDomain + 'premium'" target="_blank" rel="noopener noreferrer">
+          <i class="far fa-question-circle me-1"></i> Billing Support
+        </a>
+        <button type="button" class="btn inv-btn-outline" (click)="exportCsv()">
+          <i class="fas fa-download me-1"></i> Export All (CSV)
+        </button> -->
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="row g-3 mt-2">
+      <div class="col-md-4">
+        <div class="inv-summary h-100">
+          <div class="d-flex align-items-start gap-3">
+            <span class="inv-summary-icon"><i class="fas fa-bolt"></i></span>
+            <div>
+              <span class="inv-summary-label">AI Credits</span>
+              <div class="inv-summary-value">{{ walletLoaded() ? (available() | number) : '—' }} credits</div>
+            </div>
+          </div>
+          <div class="inv-summary-foot">
+            <span>{{ nextExpiry() ? 'Expires ' + (nextExpiry() | date: 'MMM d, y') : 'Credit balance' }}</span>
+            <a routerLink="/plans">Buy credits <i class="fas fa-arrow-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="inv-summary h-100">
+          <div class="d-flex align-items-start gap-3">
+            <span class="inv-summary-icon inv-summary-icon--green"><i class="fas fa-money-bill-wave"></i></span>
+            <div>
+              <span class="inv-summary-label">Total Spent ({{ summary().year }})</span>
+              <div class="inv-summary-value">{{ summary().totalSpent | currency: 'USD' }}</div>
+            </div>
+          </div>
+          <div class="inv-summary-foot">
+            <span>Annual ledger summary</span>
+            <span class="inv-chip">{{ summary().count }} invoices in {{ summary().year }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="inv-summary h-100">
+          <div class="d-flex align-items-start gap-3">
+            <span class="inv-summary-icon"><i class="far fa-credit-card"></i></span>
+            <div>
+              <span class="inv-summary-label">Payment Method</span>
+              <div class="inv-summary-value">
+                               @if (paymentMethod(); as pm) {
+                  <span class="inv-brand">{{ pm.brand }}</span>
+                  @if (pm.last4) { •••• {{ pm.last4 }} }
+                } @else {
+                  —
+                }
+              </div>
+            </div>
+          </div>
+          <div class="inv-summary-foot">
+<span>Last used payment gateway</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="inv-card mt-4">
+      <div class="inv-tools">
+        <div class="inv-search">
+          <i class="fa fa-search text-muted"></i>
+          <input type="text" class="form-control border-0" placeholder="Search invoice number..."
+            [value]="filters().search" (input)="onSearch($any($event.target).value)" />
+        </div>
+        <div class="d-flex gap-2">
+          <select class="form-select inv-select" [value]="filters().status" (change)="onStatus($any($event.target).value)" aria-label="Status">
+            @for (s of statusOptions; track s) {
+              <option [value]="s" [selected]="s === filters().status">{{ s === 'All' ? 'All Statuses' : s }}</option>
+            }
+          </select>
+          <select class="form-select inv-select" [value]="filters().year" (change)="onYear($any($event.target).value)" aria-label="Year">
+            <option value="All" [selected]="filters().year === 'All'">All Years</option>
+            @for (y of years(); track y) {
+              <option [value]="y" [selected]="y === filters().year">Year {{ y }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table inv-table mb-0">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loading()) {
+              @for (i of [1, 2, 3, 4]; track i) {
+                <tr class="placeholder-glow">
+                  <td><span class="placeholder col-10 rounded"></span></td>
+                  <td><span class="placeholder col-8 rounded"></span></td>
+                  <td><span class="placeholder col-11 rounded"></span></td>
+                  <td><span class="placeholder col-6 rounded"></span></td>
+                  <td><span class="placeholder col-6 rounded-pill"></span></td>
+                  <td><span class="placeholder col-6 rounded float-end"></span></td>
+                </tr>
+              }
+            } @else {
+              @for (inv of invoices(); track inv.invoiceNo) {
+                <tr [class.inv-row--failed]="inv.status === 'Failed'">
+                  <td><button type="button" class="inv-no" (click)="view(inv)">{{ inv.invoiceNo }}</button></td>
+                  <td class="inv-muted">{{ inv.date | date: 'MMM dd, y' }}</td>
+                  <td>{{ inv.description }}</td>
+                  <td><strong>{{ inv.amount | currency: inv.currency }}</strong></td>
+                  <td><span [class]="'inv-status inv-status--' + inv.status.toLowerCase()">● {{ inv.status }}</span></td>
+                  <td>
+                    <div class="inv-actions">
+                      @if (inv.status === 'Failed') {
+                        <button type="button" class="btn inv-retry" (click)="retry(inv)"><i class="fas fa-redo-alt me-1"></i> Retry</button>
+                      }
+                      <button type="button" class="inv-icon-btn" title="View invoice" (click)="view(inv)"><i class="far fa-eye"></i></button>
+                      <button type="button" class="inv-icon-btn" title="Download PDF" (click)="download(inv)"><i class="fas fa-download"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-center py-5 inv-muted">No invoices found</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalCount() > 0) {
+        <div class="inv-footer">
+          <span class="inv-muted">Showing {{ showingFrom() }} to {{ showingTo() }} of {{ totalCount() }} invoices</span>
+          @if (totalCount() > pageSize()) {
+            <ngb-pagination [collectionSize]="totalCount()" [page]="page()" [pageSize]="pageSize()" [maxSize]="5"
+              [rotate]="true" (pageChange)="onPageChange($event)" size="sm"></ngb-pagination>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (selected(); as invoice) {
+  <app-invoice-detail [invoice]="invoice" [autoPrint]="printOnOpen()" (closed)="close()"></app-invoice-detail>
+}

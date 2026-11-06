@@ -1,0 +1,253 @@
+<!-- top- header -->
+@if (menuType() !== 'default') {
+<div class="top-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex align-items-center justify-content-end">
+                    <div class="top-menu">
+                        <ul style="list-style: none;" class="list-group list-group-horizontal align-items-center">
+
+                            @if (menuType() === 'memberActive') {
+                            <li app-credit-menu></li>
+                            }
+
+                            <li ngbDropdown class="nav-item">
+                                <a class="nav-link" id="dropdownBasic1" ngbDropdownToggle>
+                                    <i class="fas fa-user-circle"></i> {{ memberInfo.name }}
+                                </a>
+
+                                @switch (menuType()) {
+                                @case ('memberActive') {
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                    <a class="dropdown-item" (click)="$event.preventDefault()" routerLink="favorites">My
+                                        Favorites</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="mydetails">Update Profile</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="myinvoices">My Invoices</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()" routerLink="archives">My
+                                        Archives</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="mypaymentdetails">Update Payment Details</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="resetpassword">Change Password</a>
+                                    <a class="dropdown-item" routerLink="/plans">AI Plans &amp; Credits</a>
+                                    <a class="dropdown-item" routerLink="/invoices">AI Invoices</a>
+                                    <a class="dropdown-item" routerLink="/app">AI Chat</a>
+                                </div>
+                                }
+                                @case ('memberExpired') {
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="mydetails">Update Profile</a>
+                                    <a class="dropdown-item" (click)="$event.preventDefault()"
+                                        routerLink="mypaymentdetails">Update Payment Details</a>
+                                </div>
+                                }
+                                }
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ environment.helpDomain }}premium">
+                                    <i class="fa fa-envelope me-2" aria-hidden="true"></i>
+                                    <span>Support </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a (click)="userLogOut()">
+                                    <i class="fa fa-sign-out-alt me-1" aria-hidden="true"></i>
+                                    <span>Sign out </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+<!-- top- header close  -->
+
+<header (scroll)="updateScrollDirection($event)" [class.sticky]="isStickyHeader() === 'up'">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-expand-xl">
+                    <a class="navbar-brand" routerLink="">
+                        <img src="../../../assets/logo.png" class="img-fluid logo" alt="fundsforNGOs" />
+                    </a>
+
+                    <div [ngbCollapse]="isMenuCollapsed()" class="collapse navbar-collapse">
+                        <ul class="navbar-nav ms-auto">
+                            @for (menu of nestedMenu(); track menu.id) {
+                            <li class="nav-item dropdown" (mouseover)="showDropdown(menu.id)"
+                                (mouseout)="showDropdown(0)" [class.nav-link-active]="
+                    menu.id === 1
+                      ? currentUrl() === '/'
+                      : menu.id === 5
+                        ? currentUrl() === '/specific-funding-alerts' ||
+                          currentUrl() === '/specific-job-alerts' ||
+                          currentUrl() === '/specific-in-country-alerts'
+                        : false
+                  ">
+                                @if (!menu.externalLink) {
+                                @if (menu.routeLink) {
+                                <a [routerLink]="menu.routeLink" class="nav-link"
+                                    [class.dropdown-toggle]="!!menu.children?.length" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false" (click)="isMenuCollapsed.set(true)"
+                                    (click)="mobileClick(menu.id)">
+                                    {{ menu.displayName }}
+                                </a>
+                                } @else {
+                                <span class="nav-link" [class.dropdown-toggle]="!!menu.children?.length" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false" (click)="mobileClick(menu.id)">
+                                    {{ menu.displayName }}
+                                </span>
+                                }
+                                } @else {
+                                @if (menu.routeLink) {
+                                <a [href]="menu.routeLink" class="nav-link" (click)="isMenuCollapsed.set(true)"
+                                    (click)="mobileClick(menu.id)">
+                                    {{ menu.displayName }}
+                                </a>
+                                } @else {
+                                <span class="nav-link" [class.dropdown-toggle]="!!menu.children?.length" role="button"
+                                    (click)="mobileClick(menu.id)">
+                                    {{ menu.displayName }}
+                                </span>
+                                }
+                                }
+
+                                @if (menu.children?.length) {
+                                <ul class="dropdown-menu" [class.d-block]="dropDownId() === menu.id"
+                                    [class.d-none]="dropDownId() !== menu.id"
+                                    [class.dropdown-menu-end]="menu.displayName === 'Alerts'">
+                                    @for (subMenu of menu.children; track subMenu.id) {
+                                    <li class="dropdown-submenu" (mouseover)="showChildrenDropDown(subMenu.id)"
+                                        (mouseout)="showChildrenDropDown(0)">
+                                        @if (subMenu.routeLink) {
+                                        @if (subMenu.externalLink) {
+                                        <a href="{{ subMenu.routeLink }}" (click)="handleSubMenuClick()"
+                                            class="dropdown-item" (click)="mobileSubMenuClick(menu.id, subMenu.id)"
+                                            [class.dropdown-toggle]="!!subMenu.children?.length">
+                                            {{ subMenu.displayName }}
+                                        </a>
+                                        } @else {
+                                        <a [routerLink]="subMenu.routeLink" (click)="handleSubMenuClick()"
+                                            class="dropdown-item" (click)="mobileSubMenuClick(menu.id, subMenu.id)"
+                                            [class.dropdown-toggle]="!!subMenu.children?.length">
+                                            {{ subMenu.displayName }}
+                                        </a>
+                                        }
+                                        } @else {
+                                        <span (click)="handleSubMenuClick()" class="dropdown-item"
+                                            (click)="mobileSubMenuClick(menu.id, subMenu.id)"
+                                            [class.dropdown-toggle]="!!subMenu.children?.length">
+                                            {{ subMenu.displayName }}
+                                        </span>
+                                        }
+
+                                        @if (subMenu.children?.length) {
+                                        <ul class="dropdown-menu" [class.d-block]="childrenDropDownId() === subMenu.id"
+                                            [class.d-none]="childrenDropDownId() !== subMenu.id">
+                                            @for (subToSub of subMenu.children; track subToSub.id) {
+                                            <li>
+                                                @if (!subToSub.externalLink) {
+                                                <a class="dropdown-item" [routerLink]="$any(subToSub.routeLink)"
+                                                    (click)="handleSubMenuClick()">
+                                                    {{ subToSub.displayName }}
+                                                </a>
+                                                } @else {
+                                                <a class="dropdown-item" [href]="subToSub.routeLink"
+                                                    (click)="handleSubMenuClick()">
+                                                    {{ subToSub.displayName }}
+                                                </a>
+                                                }
+                                            </li>
+                                            }
+                                        </ul>
+                                        }
+                                    </li>
+                                    }
+                                </ul>
+                                }
+                            </li>
+                            }
+                        </ul>
+                    </div>
+
+                    <ul class="attr-nav align-items-center m-0 p-0 ms-auto ms-md-2">
+                        @if (memberInfo.memberType !== 'EXPIRED') {
+                        <li class="nav-item" ngbDropdown display="dynamic" placement="bottom-end">
+                            <a class="nav-link" tabindex="0" ngbDropdownToggle id="Search" role="button">
+                                <i class="fas fa-search"></i>
+                            </a>
+                            <div ngbDropdownMenu aria-labelledby="Search" class="dropdown-menu">
+                                <div class="search_wrap">
+                                    <div class="search-box">
+                                        <div class="input-group d-flex align-items-center">
+                                            <input id="full-search" [ngModel]="searchQuery()"
+                                                (ngModelChange)="searchQuery.set($event)"
+                                                (input)="onSearchInputChange()" type="text" class="form-control"
+                                                placeholder="Search Everything" appOskInput />
+
+                                            <div class="input-group-btn" (click)="redirectToFullSiteSearch()">
+                                                <span class="text-white" ngbDropdownToggle>
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="searchresult col">
+                                            @if (!loading()) {
+                                            <div class="list-group">
+                                                @if (!data()) {
+                                                @for (item of searchList(); track item.url) {
+                                                <a target="_blank"
+                                                    [href]="environment.urlObj()[item.recType] + item.url">
+                                                    <div class="list-group-item">
+                                                        <span> {{ item.moduleName }} </span>
+                                                        {{ item.title }}
+                                                    </div>
+                                                </a>
+                                                }
+                                                } @else {
+                                                <small class="text-danger mt-1"> No Matching Results Found </small>
+                                                }
+                                            </div>
+                                            } @else {
+                                            <div class="text-center mt-3">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        } @else {
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </li>
+                        }
+
+                        <li class="d-inline-block d-xl-none ps-3">
+                            <button class="navbar-toggler" type="button" (click)="toggleMenu()">
+                                @if (isMenuCollapsed()) {
+                                <i class="fas fa-bars"></i>
+                                } @else {
+                                <i class="fas fa-times"></i>
+                                }
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>

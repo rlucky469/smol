@@ -1,0 +1,47 @@
+<section class="pay-section">
+  <div id="logo-box">
+
+    <div class="mb-3">
+      <img src="assets/logo.png" class="logo" alt="fundsforNGOs" />
+    </div>
+
+    @if (state() === 'checking') {
+      <div class="circle-wrapper">
+        <div class="loader"><span></span></div>
+      </div>
+
+      <p class="sub_heading1 mt-4">Confirming your payment...</p>
+      <p class="body_text mt-2">
+        This can take a few minutes. Please do not refresh the page or click the "back" or "close" button of
+        your browser.
+      </p>
+    } @else {
+      <div class="circle-wrapper">
+        <div class="success circle"></div>
+        <div class="icon"><i class="fas fa-check"></i></div>
+      </div>
+
+      <h1 class="heading py-2 text-success fw-bold mt-2">Successful Payment</h1>
+      <p class="body_text">{{ payment()?.message || 'Your payment has been completed successfully' }}</p>
+
+      @if (payment(); as p) {
+        <div class="pay-summary">
+          <div><span>Invoice</span><strong>{{ p.invoiceNo }}</strong></div>
+          @if (p.creditsPurchased) {
+            <div><span>Credits</span><strong>{{ (p.creditsPurchased + (p.bonusCredits || 0)) | number }}</strong></div>
+          }
+          @if (p.totalAmount) {
+            <div><span>Amount</span><strong>{{ p.totalAmount | currency: 'USD' }}</strong></div>
+          }
+          <div><span>Balance</span><strong>{{ available() | number }} credits</strong></div>
+        </div>
+      }
+
+      <div class="pay-actions">
+        <a routerLink="/app" class="primary-btnn px-4">Start using AI</a>
+        <a routerLink="/invoices" class="secondary-btnn px-4">View invoices</a>
+      </div>
+    }
+
+  </div>
+</section>

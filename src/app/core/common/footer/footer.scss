@@ -1,0 +1,116 @@
+@use "../../../../variables.scss" as *;
+
+footer {
+    .footer-top {
+        @include spacing(60px 0 30px 0);
+        background-color: var(--bgBlack);
+        border-top: var(--border);
+        border-bottom: var(--border);
+        .footer-info {
+            i {
+                @include paragraph(24px, var(--primaryClr));
+                margin-right: 15px;
+            }
+            .contact-add p {
+                @include paragraph(var(--bodyFont), var(--bgBlackTextClr), var(--lineHeight));
+                letter-spacing: 0.3px;
+                padding-bottom: 0;
+                display: block;
+                opacity: 0.9;
+               
+                a {
+                    
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+
+    .footer-bottom {
+        background-color: var(--bgPrimary);
+        p,
+        ul {
+            margin-bottom: 0;
+            @include paragraph(var(--smallFont), var(--bgPrimaryText))
+        }
+
+        #footer-menu {
+            li {
+                a {
+                    text-decoration: none;
+
+                    @include paragraph(var(--smallFont), var(--bgPrimaryText))
+                }
+            }
+        }
+
+        .socials-item {
+            display: inline-block;
+            margin: 0 5px;
+            @include box(30px, 30px);
+            @include animation(transition, all 0.3s);
+            @include border(50%);
+            @include paragraph(var(--smallFont), #fff, 28px, $align:center,);
+            background-color: #141421;
+            border: 1px solid #2e2e4c;
+            i {
+                fill: white;
+                @include box(18px, 28px);
+                margin: auto;
+                display: block;
+                padding-left: 2px;
+                line-height: 28px;
+            }
+        }
+
+        .share ul li:hover a,
+        .socials-colored .socials-item:hover i {
+            color: #fff !important;
+        }
+
+        .share ul li.share-fb:hover,
+        .fb:hover {
+            background: #3b5999;
+        }
+
+        .share ul li.share-fb a {
+            color: #3b5999;
+        }
+
+        .share ul li.share-tw:hover,
+        .tw:hover {
+            background: #55acee;
+        }
+
+        .share ul li.share-tw a {
+            color: #55acee;
+        }
+
+        .share ul li.share-gu a {
+            color: #b92b27;
+        }
+
+        .share ul li.share-gu:hover,
+        .qu:hover {
+            background: #b92b27;
+        }
+
+        .share ul li.share-ins a {
+            color: #e60080;
+        }
+
+        .share ul li.share-ins:hover,
+        .ins:hover {
+            background: #e60080;
+        }
+
+        .share ul li.share-yt a {
+            color: red;
+        }
+
+        .share ul li.share-yt:hover,
+        .you:hover {
+            background: red;
+        }
+    }
+}

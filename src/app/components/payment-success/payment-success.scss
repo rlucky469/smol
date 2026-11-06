@@ -1,0 +1,190 @@
+@use "../../../variables.scss" as *;
+
+.pay-section {
+  min-height: 80vh;
+ 
+  place-content: center;
+  place-items: center;
+  padding: 40px 12px;
+  background: var(--bgClr);
+}
+
+#logo-box {
+  display: block;
+  text-align: center;
+  width: 100%;
+  max-width: 440px;
+  min-height: 400px;
+  @include spacing(30px 24px, 0 auto);
+  @include bgShadow(var(--highLightBox), var(--shadow));
+
+  .logo {
+    height: 46px;
+  }
+
+  .heading,
+  .sub_heading1,
+  p {
+    text-align: var(--textCenter);
+  }
+
+  .success {
+    background-color: #4bb543;
+    border: 2.5px dashed #4bb543;
+  }
+
+  .error {
+    background-color: #ca0b00;
+    border: 2.5px dashed #ca0b00;
+  }
+
+  .circle-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 20px auto 10px;
+  }
+
+  .icon {
+    position: absolute;
+    color: #fff;
+    font-size: 45px;
+    top: 52px;
+    left: 52px;
+    transform: translate(-50%, -50%);
+  }
+
+  .circle {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    padding: 2.5px;
+    background-clip: content-box;
+    animation: spin 10s linear infinite;
+  }
+
+  .circle-wrapper:active .circle {
+    animation: spin 2s linear infinite;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+// Summary + buttons
+.pay-summary {
+  background: var(--bgClr);
+  border: 1px solid #eceef5;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin: 16px 0 6px;
+  text-align: left;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: var(--bodyFont);
+
+    span {
+      opacity: 0.6;
+    }
+  }
+}
+
+.pay-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.pay-support {
+  display: block;
+  margin-top: 16px;
+  font-size: var(--smallFont);
+  color: var(--linkClr);
+}
+
+// 4-dot loader (same as the old payment page)
+.loader {
+  position: relative;
+  height: 32px;
+  width: 32px;
+  margin: 34px auto;
+  animation: loader-1 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+
+  &::before,
+  &::after,
+  span::before,
+  span::after {
+    content: "";
+    display: block;
+    position: absolute;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    background: #0088cc;
+    border-radius: 50%;
+  }
+
+  &::before {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    animation: loader-2 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+  }
+  &::after {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    animation: loader-3 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+  }
+
+  span {
+    display: block;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    height: 32px;
+    width: 32px;
+
+    &::before {
+      top: 0;
+      left: 0;
+      right: 0;
+      animation: loader-4 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+    }
+    &::after {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      animation: loader-5 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+    }
+  }
+}
+
+@keyframes loader-1 {
+  to { transform: rotate(360deg); }
+}
+@keyframes loader-2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(24px, 0, 0) scale(0.5); }
+}
+@keyframes loader-3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-24px, 0, 0) scale(0.5); }
+}
+@keyframes loader-4 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, 24px, 0) scale(0.5); }
+}
+@keyframes loader-5 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -24px, 0) scale(0.5); }
+}

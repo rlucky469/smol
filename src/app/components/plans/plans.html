@@ -1,0 +1,154 @@
+<app-bread-crumbs title="Plans"></app-bread-crumbs>
+
+<div class="plans-page py-5">
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="text-center plans-hero">
+      <span class="plans-badge"><i class="fas fa-magic me-1"></i> AI-Powered Grant Intelligence</span>
+      <h1 class="fw-bold mt-3 mb-2">Choose your plan</h1>
+      <p class="text-muted mb-0">Get more AI credits to find, evaluate, and win grants faster with precision matching.</p>
+    </div>
+
+    <!-- Current balance -->
+    <div class="plans-balance mt-4" [class.plans-balance--empty]="isEmpty()">
+      <div class="d-flex align-items-center gap-3">
+        <span class="plans-balance-icon"><i class="fas fa-bolt"></i></span>
+        <div>
+          <span class="plans-balance-label">Available Balance</span>
+          <strong class="plans-balance-value">
+            {{ walletLoaded() ? (available() | number) : '—' }} credits
+          </strong>
+        </div>
+      </div>
+      <div class="plans-balance-meta">
+        {{ used() | number }} used
+        @if (nextExpiry()) {
+          <span class="mx-1">·</span> Expires {{ nextExpiry() | date: 'MMM d, y' }}
+        }
+      </div>
+    </div>
+
+    <!-- Plan cards -->
+    <div class="row g-4 justify-content-center mt-4">
+      @if (loading()) {
+        @for (i of [1, 2]; track i) {
+          <div class="col-md-6 col-lg-5 col-xl-4">
+            <div class="plan-card h-100 placeholder-glow">
+              <span class="placeholder col-5 mb-3 rounded" style="height: 22px;"></span>
+              <span class="placeholder col-8 mb-4 rounded"></span>
+              <span class="placeholder col-4 mb-3 rounded" style="height: 36px;"></span>
+              <span class="placeholder col-12 mb-4 rounded" style="height: 38px;"></span>
+              <span class="placeholder col-10 mb-2 rounded"></span>
+              <span class="placeholder col-9 mb-2 rounded"></span>
+              <span class="placeholder col-11 mb-4 rounded"></span>
+              <span class="placeholder col-12 rounded" style="height: 42px;"></span>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (plan of plans(); track plan.aiPlanIndex) {
+          <div class="col-md-6 col-lg-5 col-xl-4">
+            <div class="plan-card h-100 d-flex flex-column" [class.plan-card--featured]="plan.aiPlanIndex === bestValueId()">
+              @if (plan.aiPlanIndex === bestValueId()) {
+                <span class="plan-ribbon"><i class="fas fa-star me-1"></i> Best Value</span>
+              }
+
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <h3 class="plan-name">{{ plan.planName }}</h3>
+                <span class="plan-chip">{{ plan.validityDays }} days</span>
+              </div>
+              <p class="plan-desc">{{ plan.planDescription }}</p>
+
+              <div class="plan-price">
+                {{ plan.priceUSD | currency: 'USD' }}<small> one-time</small>
+              </div>
+
+              <div class="plan-credits">
+                <i class="fas fa-bolt me-1"></i> {{ plan.credits | number }} credits
+                @if (plan.bonusCredits) {
+                  <span class="plan-bonus">+{{ plan.bonusCredits | number }} bonus</span>
+                }
+              </div>
+
+              <ul class="plan-features flex-grow-1">
+                <li>{{ totalCredits(plan) | number }} total AI credits</li>
+                <li>Valid for {{ plan.validityDays }} days</li>
+                <li>{{ pricePerThousand(plan) | currency: 'USD' }} per 1,000 credits</li>
+                <li>AI chat, grant search and profile analysis</li>
+              </ul>
+
+             <button type="button" class="btn plan-btn text-center rounded-2"
+                [class.plan-btn--primary]="plan.aiPlanIndex === bestValueId()"
+                [disabled]="buyingId() !== null"
+                (click)="buy(plan)">
+                @if (buyingId() === plan.aiPlanIndex) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span> Redirecting...
+                } @else {
+                  Buy {{ plan.planName }}
+                }
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="col-12">
+            <p class="text-center text-muted py-5 mb-0">No plans are available right now. Please try again later.</p>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Credit costs -->
+    <!-- <section class="plans-section">
+      <div class="plans-section-card">
+        <h2 class="plans-section-title"><i class="fas fa-coins me-2"></i> What do credits cost?</h2>
+        <p class="plans-section-sub">
+          Credits power the fundsforNGOs AI engine. Each AI action deducts credits based on the AI usage of that request.
+        </p>
+        <div class="row g-3">
+          @for (cost of creditCosts; track cost.title) {
+            <div class="col-md-4">
+              <div class="cost-card h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h4 class="cost-title">{{ cost.title }}</h4>
+                  <span class="cost-icon"><i [class]="cost.icon"></i></span>
+                </div>
+                <p class="cost-desc">{{ cost.description }}</p>
+                <div class="cost-rate"><span>Rate</span><strong>{{ cost.rate }}</strong></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section> -->
+
+    <!-- FAQ -->
+    <!-- <section class="plans-section">
+      <h2 class="plans-section-title text-center">Frequently asked questions</h2>
+      <p class="plans-section-sub text-center">
+        Have questions about credits or billing?
+        <a [href]="environment.helpDomain + 'premium'" target="_blank" rel="noopener noreferrer">We are here to help.</a>
+      </p>
+
+      <div class="faq-list">
+        @for (faq of faqs; track faq.q; let i = $index) {
+          <div class="faq-item" [class.faq-item--open]="openFaq() === i">
+            <button type="button" class="faq-q" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq() === i">
+              {{ faq.q }}
+              <i class="fas" [class.fa-chevron-up]="openFaq() === i" [class.fa-chevron-down]="openFaq() !== i"></i>
+            </button>
+            @if (openFaq() === i) {
+              <div class="faq-a">{{ faq.a }}</div>
+            }
+          </div>
+        }
+      </div>
+
+      <p class="text-center mt-4 mb-0">
+        <a routerLink="/invoices" class="plans-link"><i class="far fa-file-alt me-1"></i> View your invoices</a>
+      </p>
+    </section> -->
+
+
+  </div>
+</div>
